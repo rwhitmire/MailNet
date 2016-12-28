@@ -8,8 +8,9 @@ const proxy = {
     const connection = $.hubConnection()
     const mailHubProxy = connection.createHubProxy('mailHub')
 
-    mailHubProxy.on('receiveMessage', () => {
-      store.dispatch(receiveMessage({}))
+    mailHubProxy.on('receiveMessage', message => {
+      debugger
+      store.dispatch(receiveMessage(message))
     })
 
     return connection.start()

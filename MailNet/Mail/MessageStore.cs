@@ -1,6 +1,9 @@
 using System;
+using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using MimeKit;
 using SmtpServer;
 using SmtpServer.Mail;
 using SmtpServer.Protocol;
@@ -21,7 +24,13 @@ namespace MailNet.Mail
         {
             Console.WriteLine("MyMessageStore.SaveAsync");
             Console.WriteLine(message.Mime);
-            Store.AddMessage();
+
+            var stream = new MemoryStream(Encoding.UTF8.GetBytes(message.Mime.ToString()));
+            var parser = new MimeParser(stream);
+            var parsedMessage = parser.ParseMessage();
+
+            Store.AddMessage(parsedMessage);
+
             return Task.FromResult(new SmtpResponse(SmtpReplyCode.Ok));
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.AspNet.SignalR;
 using Microsoft.Owin.Hosting;
 
@@ -14,10 +15,19 @@ namespace MailNet.Web
 
             Console.WriteLine("Running on http://localhost:5000");
 
-            Store.OnMessageReceived(() =>
+            Store.OnMessageReceived(message =>
             {
                 var context = GlobalHost.ConnectionManager.GetHubContext<MailHub>();
-                context.Clients.All.receiveMessage("foobar!");
+
+                context.Clients.All.receiveMessage(new
+                {
+                    from = message.From.Mailboxes.Select(x => new {x.Name, x.Address}),
+                    to = message.To.Mailboxes.Select(x => new {x.Name, x.Address}),
+                    date = message.Date,
+                    htmlBody = message.HtmlBody,
+                    textBody = message.TextBody,
+                    subject = message.Subject
+                });
             });
         }
 
